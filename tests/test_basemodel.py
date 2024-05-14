@@ -104,5 +104,38 @@ class TestDictContents(unittest.TestCase):
         self.assertNotEqual(self.obj_dict['name'], obj_dict2['name'])
 
 
+class TestArgsKwargs(unittest.TestCase):
+    def setUp(self):
+        self.my_model = BaseModel()
+        self.json_dict = self.my_model.to_dict()
+        self.new_json = self.json_dict.copy()
+        self.new_json['__class__'] = 'ABC_class'
+        self.my_model2 = BaseModel(name="Alexander", **self.new_json)
+
+    def tearDown(self):
+        del self.my_model
+        del self.json_dict
+
+    def test_InstanceFromJsonDict(self):
+        new_model = BaseModel(**self.json_dict)
+        self.assertIsInstance(new_model, BaseModel)
+
+    def test_ClassKey(self):
+        json_dict2 = self.my_model2.to_dict()
+        self.assertNotEqual(json_dict2['__class__'], 'ABC_class')
+
+    def test_InstancesOfAttrFromJsonDict(self):
+        self.assertIsInstance(self.my_model2.id, str)
+        self.assertIsInstance(self.my_model2.created_at, datetime)
+        self.assertIsInstance(self.my_model2.updated_at, datetime)
+        self.assertNotIn('__class__', self.my_model2.__dict__)
+
+    def test_attributeValidations(self):
+        new_dict = self.my_model2.to_dict()
+        for key in self.new_json.keys():
+            with self.subTest(key=key):
+                self.assertIn(key, self.new_json)
+
+
 if __name__ == "__main__":
     unittest.main()
