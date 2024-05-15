@@ -1,9 +1,12 @@
 #!/usr/bin/python3
 """Test module for <BaseModel> class
 """
+import os
+import json
 import unittest
-from models.base_model import BaseModel
+from time import sleep
 from datetime import datetime
+from models.base_model import BaseModel
 
 
 class TestBaseModelInstances(unittest.TestCase):
@@ -105,7 +108,9 @@ class TestDictContents(unittest.TestCase):
 
 
 class TestArgsKwargs(unittest.TestCase):
+
     def setUp(self):
+        """Sets up all neccessary protocols for unittesting."""
         self.my_model = BaseModel()
         self.json_dict = self.my_model.to_dict()
         self.new_json = self.json_dict.copy()
@@ -113,28 +118,62 @@ class TestArgsKwargs(unittest.TestCase):
         self.my_model2 = BaseModel(name="Alexander", **self.new_json)
 
     def tearDown(self):
+        """Cleans up memory area used by <setUp> method."""
         del self.my_model
+        del self.my_model2
         del self.json_dict
+        del self.new_json
+        if os.path.isfile("file.json"):
+            os.remove("file.json")
 
     def test_InstanceFromJsonDict(self):
+        """Checks if instances from a json document was instantiated
+        properly.
+        """
         new_model = BaseModel(**self.json_dict)
         self.assertIsInstance(new_model, BaseModel)
 
     def test_ClassKey(self):
+        """Makes sure that <__class__> was never overwritten, even when provided.
+        """
         json_dict2 = self.my_model2.to_dict()
         self.assertNotEqual(json_dict2['__class__'], 'ABC_class')
 
     def test_InstancesOfAttrFromJsonDict(self):
+        """Checks if all deserialized attributes were instantiated correctly.
+        """
         self.assertIsInstance(self.my_model2.id, str)
         self.assertIsInstance(self.my_model2.created_at, datetime)
         self.assertIsInstance(self.my_model2.updated_at, datetime)
         self.assertNotIn('__class__', self.my_model2.__dict__)
 
     def test_attributeValidations(self):
+        """Validates that all attributes passed by <**kwargs> were set
+        properly and do exist.
+        """
         new_dict = self.my_model2.to_dict()
         for key in self.new_json.keys():
             with self.subTest(key=key):
                 self.assertIn(key, self.new_json)
+
+
+class TestJsonSerializationDeserialization(unittest.TestCase):
+
+    def setUp(self):
+        """Sets up all neccessary protocols for unittesting."""
+        self.my_model = BaseModel()
+
+    def tearDown(self):
+        """Cleans up memory area and facilities used by <setUp> method."""
+        del self.my_model
+        if os.path.isfile("file.json"):
+            os.system("rm file.json")
+
+    def test_FileJsonValidation(self):
+        """Checks if <file.json> file was created after ruing <*.save()>.
+        """
+        self.my_model.save()
+        self.assertTrue(os.path.isfile('file.json'))
 
 
 if __name__ == "__main__":
