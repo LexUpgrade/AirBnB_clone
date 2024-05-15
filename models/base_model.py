@@ -2,6 +2,7 @@
 """Defines a base class <BaseModel>."""
 from uuid import uuid4
 from datetime import datetime
+import models
 
 
 class BaseModel:
@@ -9,17 +10,18 @@ class BaseModel:
 
     def __init__(self, *args, **kwargs):
         """Instantiates an object of <BaseModel>."""
-        if not kwargs:
-            self.id = str(uuid4())
-            self.created_at = datetime.now()
-            self.updated_at = datetime.now()
-        else:
+        self.id = str(uuid4())
+        self.created_at = datetime.now()
+        self.updated_at = datetime.now()
+        if len(kwargs) != 0:
             for k in kwargs.keys():
                 if k != '__class__':
                     if k in ['created_at', 'updated_at']:
                         setattr(self, k, datetime.fromisoformat(kwargs[k]))
                     else:
                         setattr(self, k, kwargs[k])
+        else:
+            models.storage.new(self)
 
     def __str__(self):
         """Prints information of a <BaseModel> instance."""
@@ -30,6 +32,7 @@ class BaseModel:
         the current datetime.
         """
         self.updated_at = datetime.now()
+        models.storage.save()
 
     def to_dict(self):
         """Returns a dictionary containing all keys/values of
