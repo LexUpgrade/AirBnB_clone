@@ -9,6 +9,11 @@ class HBNBCommand(cmd.Cmd):
 
     prompt = "(hbhb) "
 
+    def emptyline(self):
+        """emptyline command to execute when an emptyline command is passed.
+        """
+        pass
+
     def do_quit(self, arg):
         """Quite command to exit the program.
         """
@@ -19,10 +24,6 @@ class HBNBCommand(cmd.Cmd):
         """
         print()
         return True
-
-    def emptyline(self):
-        """Command to execute if an emptyline was passed."""
-        pass
 
 
 if __name__ == "__main__":
