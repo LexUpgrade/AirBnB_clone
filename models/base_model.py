@@ -6,10 +6,15 @@ import models
 
 
 class BaseModel:
-    """Defines all common attributes/methods for other classes."""
+    """Defines all common attributes/methods for other classes to inherit."""
 
     def __init__(self, *args, **kwargs):
-        """Instantiates an object of <BaseModel>."""
+        """Instantiates an object of <BaseModel>.
+
+        Args:
+            args (list): **WILL NEVER BE USE**.
+            kwarg (dict): key/word arguement from  json file for instantiation.
+        """
         self.id = str(uuid4())
         self.created_at = datetime.now()
         self.updated_at = datetime.now()
@@ -29,7 +34,7 @@ class BaseModel:
 
     def save(self):
         """Updates the public instance attribute <updated_at> with
-        the current datetime.
+        the current datetime. And updates the JSON file 'file.json'.
         """
         self.updated_at = datetime.now()
         models.storage.save()
