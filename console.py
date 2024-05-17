@@ -2,6 +2,12 @@
 """Defines a class <HBNBCommand>."""
 import cmd
 from models import storage
+from models.user import User
+from models.city import City
+from models.state import State
+from models.place import Place
+from models.review import Review
+from models.amenity import Amenity
 from models.base_model import BaseModel
 
 
@@ -9,14 +15,14 @@ def validateArgs(arg, all_objs, commands):
     """Validates that <arg> passed to the interpreter are valid commands.
     """
     obj_keys = list(all_objs)
-    id_keys = [i.rsplit('.')[1] for i in obj_keys]
 
     arg_len = len(arg.split())
     if arg_len == 2:
-        cls_name, id_key = arg.split(" ")
+        cls_name = arg.split()[0]
+        arg_key = arg.split()[0] + '.' + arg.split()[1]
         if cls_name not in commands:
             print("** class doesn't exist **")
-        elif id_key not in id_keys:
+        elif arg_key not in obj_keys:
             print("** no instance found **")
         else:
             return True
@@ -40,7 +46,9 @@ class HBNBCommand(cmd.Cmd):
     """A command interpreter."""
 
     prompt = "(hbhb) "
-    commands = ['BaseModel']
+    __commands = ['BaseModel', 'User', 'State', 'City', 'Amenity',
+                  'Place', 'Review'
+                  ]
 
     def emptyline(self):
         """Command to execute when an emptyline is read.
@@ -67,18 +75,19 @@ class HBNBCommand(cmd.Cmd):
 
     def complete_create(self, text, line, beidx, enidx):
         if text:
-            complete = [c for c in self.commands if c.startswith(text)]
+            complete = [c for c in self.__commands if c.startswith(text)]
         else:
-            complete = self.commands.copy()
+            complete = self.__commands.copy()
         return complete
 
     def do_create(self, arg):
         if not arg:
             print("** class name missing **")
-        elif arg not in self.commands:
+        elif arg not in self.__commands:
             print("** class dosen't exist **")
         else:
-            my_model = BaseModel()
+            cls_name = arg + "()"
+            my_model = eval(cls_name)
             my_model.save()
             print(my_model.id)
 
@@ -90,14 +99,14 @@ class HBNBCommand(cmd.Cmd):
 
     def complete_show(self, text, line, beidx, enidx):
         if text:
-            complete = [c for c in self.commands if c.startswith(text)]
+            complete = [c for c in self.__commands if c.startswith(text)]
         else:
-            complete = self.commands.copy()
+            complete = self.__commands.copy()
         return complete
 
     def do_show(self, arg):
         all_objs = storage.all()
-        if validateArgs(arg, all_objs, self.commands.copy()):
+        if validateArgs(arg, all_objs, self.__commands.copy()):
             key = ".".join(arg.split())
             print(all_objs[key])
 
@@ -109,14 +118,14 @@ class HBNBCommand(cmd.Cmd):
 
     def complete_destroy(self, text, line, beidx, enidx):
         if text:
-            complete = [c for c in self.commands if c.startswith(text)]
+            complete = [c for c in self.__commands if c.startswith(text)]
         else:
             complete = self.commands.copy()
         return complete
 
     def do_destroy(self, arg):
         all_objs = storage.all()
-        if validateArgs(arg, all_objs, self.commands.copy()):
+        if validateArgs(arg, all_objs, self.__commands.copy()):
             key = ".".join(arg.split())
             del all_objs[key]
             storage.save()
@@ -131,9 +140,9 @@ class HBNBCommand(cmd.Cmd):
 
     def complete_all(self, text, line, beidx, enidx):
         if text:
-            complete = [c for c in self.commands if c.startswith(text)]
+            complete = [c for c in self.__commands if c.startswith(text)]
         else:
-            complete = self.commands.copy()
+            complete = self.__commands.copy()
         return complete
 
     def do_all(self, arg):
@@ -142,7 +151,7 @@ class HBNBCommand(cmd.Cmd):
         if not arg:
             [print(obj) for i, obj in all_objs.items()]
         else:
-            if arg not in self.commands:
+            if arg not in self.__commands:
                 print("** class dosen't exist **")
             else:
                 for k, v in all_objs.items():
@@ -158,9 +167,9 @@ class HBNBCommand(cmd.Cmd):
 
     def complete_update(self, text, line, beidx, enidx):
         if text:
-            complete = [c for c in self.commands if c.startswith(text)]
+            complete = [c for c in self.__commands if c.startswith(text)]
         else:
-            complete = self.commands.copy()
+            complete = self.__commands.copy()
         return complete
 
     def do_update(self, arg):
@@ -169,14 +178,14 @@ class HBNBCommand(cmd.Cmd):
 
         if len(arg.split()) <= 1:
             if arg:
-                if arg in self.commands:
+                if arg in self.__commands:
                     print("** instance id missing **")
                 else:
                     print("** class name doesn't exist **")
             else:
                 print("** class name missing **")
         elif len(arg.split()) == 2:
-            if arg.split()[0] not in self.commands:
+            if arg.split()[0] not in self.__commands:
                 print("** class name doesn't exist **")
             else:
                 if arg.split()[1] not in obj_keys:
@@ -184,7 +193,7 @@ class HBNBCommand(cmd.Cmd):
                 else:
                     print("** attribute name missing **")
         elif len(arg.split()) == 3:
-            if arg.split()[0] not in self.commands:
+            if arg.split()[0] not in self.__commands:
                 print("** class doesn't exist **")
             else:
                 if arg.split()[1] not in obj_keys:
@@ -193,7 +202,7 @@ class HBNBCommand(cmd.Cmd):
                     print("** value missing **")
         else:
             cls_name, id, key, value = arg.split(' ', 3)
-            if cls_name not in self.commands:
+            if cls_name not in self.__commands:
                 print("** class name doesn't exist **")
             elif id not in obj_keys:
                 print("** no instance found **")
