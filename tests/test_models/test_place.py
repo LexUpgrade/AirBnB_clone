@@ -1,7 +1,5 @@
 #!/usr/bin/python3
-"""Test file for <models.amenity.Amenity>.
+"""Test file for <models.place.Place>.
 """
-import cmd
-import concole
-from models import storage
-from models.amenity import Amenity
+import unittest
+from models.place import Place
