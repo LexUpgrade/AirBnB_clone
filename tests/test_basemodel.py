@@ -134,7 +134,8 @@ class TestArgsKwargs(unittest.TestCase):
         self.assertIsInstance(new_model, BaseModel)
 
     def test_ClassKey(self):
-        """Makes sure that <__class__> was never overwritten, even when provided.
+        """Makes sure that <__class__> was never overwritten, even when
+        provided.
         """
         json_dict2 = self.my_model2.to_dict()
         self.assertNotEqual(json_dict2['__class__'], 'ABC_class')
