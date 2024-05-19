@@ -93,7 +93,7 @@ def argToDict(arg):
         dt_str = dt.group().strip(")").strip("{}")
         kw_list = dt_str.split(",")
         for i in kw_list:
-            k = i.split()[0].rstrip(":").strip("\"'")
+            k = str(i.split()[0].rstrip(":").strip("\"'"))
             v = i.split()[1][:-1]
             tmp_dict[k] = v
     else:
@@ -315,7 +315,7 @@ class HBNBCommand(cmd.Cmd):
 
         obj = all_objs[cls + '.' + id]
         for key, value in dictionary.items():
-            setattr(obj, key, value)
+            setattr(obj, str(key), value)
         storage.save()
 
 
