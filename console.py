@@ -63,21 +63,26 @@ class HBNBCommand(cmd.Cmd):
                 'all': self.do_all,
                 'count': self.do_count,
                 'show' : self.do_show,
-                'destroy' : self.do_destroy
+                'destroy' : self.do_destroy,
+                'update': self.do_update
                 }
-        cmd_arg = re.search(r"\..+\(", arg)
-        cls_name = re.search(r".+\.", arg)
-        id_n = re.search(r"\".+\"", arg)
-        if cls_name:
-            c = cls_name.group().strip(".")
-            if c in self.__commands:
-                if cmd_arg:
-                    c_arg = cmd_arg.group().strip(".()")
-                    if c_arg in list(command_dict.keys()):
-                        if id_n:
-                            id = id_n.group().strip('"\'')
-                            return command_dict[c_arg](c + " " + id)
-                        return command_dict[c_arg](c)
+        args = None
+        cls_name = re.search(r"\w+\.", arg)
+        cmd_arg = re.search(r"\..+\)", arg)
+        id_n = re.search(r"\"(.+-){4}[0-9a-z]+\"", arg)
+        kwarg = re.search(r", \"[\x00-\x7f]+\)", arg)
+        if cmd_arg:
+            c_arg = re.search(r"[^.].+\(", cmd_arg.group()).group()[:-1]
+            if c_arg in list(command_dict.keys()):
+                c = cls_name.group()[:-1]
+                if c in self.__commands:
+                    args = c
+                    if id_n:
+                        args += ' ' + id_n.group()[1:-1]
+                        if kwarg:
+                            args += ' '\
+                                    + kwarg.group()[3:].replace("\",", "")[:-1]
+                return command_dict[c_arg](args)
         print(f"*** Unknown syntax: {arg}")
         return False
 
@@ -180,6 +185,7 @@ class HBNBCommand(cmd.Cmd):
         else:
             if arg not in self.__commands:
                 print("** class dosen't exist **")
+                return False
             else:
                 for k, v in all_objs.items():
                     if k.rsplit(".")[0] == arg:
