@@ -59,8 +59,8 @@ class TestUserInstantiation(unittest.TestCase):
         self.assertEqual(d['__class__'], 'User')
 
 
-
 class TestUserSave(unittest.TestCase):
+    """Test the save functionality of <save>."""
 
     @classmethod
     def setUpClass(cls):
@@ -103,7 +103,8 @@ class TestUserSave(unittest.TestCase):
 
 
 class TestUserAttributes(unittest.TestCase):
-
+    """Validates attributes of a <User> object.
+    """
     def test_user_attr_email(self):
         self.assertTrue(hasattr(User(), 'email'))
 
@@ -118,7 +119,8 @@ class TestUserAttributes(unittest.TestCase):
 
 
 class TestUserAttributeAccessibilityAndType(unittest.TestCase):
-
+    """Test the accessibility of attributes and their type.
+    """
     def setUp(self):
         self.usr = User()
 
@@ -133,6 +135,7 @@ class TestUserAttributeAccessibilityAndType(unittest.TestCase):
 
     def test_user_email(self):
         self.assertIsInstance(self.usr.email, str)
+
 
 if __name__ == "__main__":
     unittest.main()
