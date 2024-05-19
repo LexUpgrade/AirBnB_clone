@@ -34,7 +34,8 @@ class TestStateInstantiation(unittest.TestCase):
 
     def test_str_return_value(self):
         state = State()
-        cls, id, dict = type(state).__name__, str(state.id), str(state.__dict__)
+        cls, id, dict = type(state).__name__, str(state.id), \
+            str(state.__dict__)
         self.assertIn(cls, str(state))
         self.assertIn(id, str(state))
         self.assertIn(dict, str(state))
@@ -42,7 +43,7 @@ class TestStateInstantiation(unittest.TestCase):
     def test_created_at_in_dict(self):
         d = State().to_dict()
         self.assertTrue(type(d['created_at']), str)
-    
+
     def test_updated_at_in_dict(self):
         d = State().to_dict()
         self.assertTrue(type(d['updated_at']), str)
