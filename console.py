@@ -51,12 +51,14 @@ class HBNBCommand(cmd.Cmd):
                   'Place', 'Review'
                   ]
 
-    def do_quit(self):
-        """Quit command to exit the program"""
+    def do_quit(self, arg):
+        """Quit command to exit the program
+        """
         return True
 
-    def do_EOF(self):
-        """Handles the end-of-file signal"""
+    def do_EOF(self, arg):
+        """Handles the end-of-file signal
+        """
         print("")
         return True
 
