@@ -43,6 +43,78 @@ def validateArgs(arg, all_objs, commands):
     return False
 
 
+def validateUpdateArgs(arg, ids, commands):
+    """Validates <arg> from update.
+    """
+    if re.search(r"\{.+\}\)$", arg):
+        return True
+
+    if len(arg.split()) <= 1:
+        if len(arg.split()) == 0:
+            print("** class name missing **")
+        elif len(arg.split()) == 1:
+            if arg in commands:
+                print("** instance id missing **")
+            else:
+                print("** class doesn't exist **")
+    elif len(arg.split()) == 2:
+        if arg.split()[0] in commands:
+            if arg.split()[1] not in ids:
+                print("** no instance found **")
+            else:
+                print("** attribute name missing **")
+        else:
+            print("** class doesn't exist **")
+    elif len(arg.split()) == 3:
+        if arg.split()[0] in commands:
+            if arg.split()[1] not in ids:
+                print("** no instance found **")
+            else:
+                print("** value missing **")
+        else:
+            print("** class doesn't exist **")
+    else:
+        cls, id, key, value = arg.split(' ', 3)
+        if cls not in commands:
+            print("** class name doesn't exist **")
+        elif id not in ids:
+            print("** no instance found **")
+        else:
+            return True
+    return False
+
+
+def argToDict(arg):
+    """Returns a dictionary of key/word arguments.
+    """
+    dictionary, tmp_dict, cls, id = dict(), dict(), None, None
+    dt = re.search(r"\{(.)+\}\)$", arg)
+    if dt:
+        dt_str = dt.group().strip(")").strip("{}")
+        kw_list = dt_str.split(",")
+        for i in kw_list:
+            k = i.split()[0].rstrip(":").strip("\"'")
+            v = i.split()[1][:-1]
+            tmp_dict[k] = v
+    else:
+        cls, id, key, value = arg.split(' ', 3)
+        tmp_dict[key] = value
+
+    for k, v in tmp_dict.items():
+        ky = k.strip("\"'")
+        if v.isdigit():
+            dictionary[ky] = int(v)
+        elif len(v.split('.')) == 2 and\
+                all([i.isdigit() for i in v.split('.')]):
+            dictionary[ky] = float(v)
+        else:
+            if v[0] == '"' and v[len(v) - 1] == '"':
+                dictionary[ky] = v.strip('"')
+            else:
+                dictionary[ky] = str(v)
+    return (cls, id, dictionary)
+
+
 class HBNBCommand(cmd.Cmd):
     """A command interpreter."""
 
@@ -233,55 +305,18 @@ class HBNBCommand(cmd.Cmd):
 
     def do_update(self, arg):
         all_objs = storage.all()
-        obj_keys = [i.split(".")[1] for i in list(all_objs)]
+        ids = [i.split(".")[1] for i in list(all_objs.keys())]
+        cls, id, dictionary = None, None, None
 
-        if len(arg.split()) <= 1:
-            if arg:
-                if arg in self.__commands:
-                    print("** instance id missing **")
-                else:
-                    print("** class name doesn't exist **")
-            else:
-                print("** class name missing **")
-        elif len(arg.split()) == 2:
-            if arg.split()[0] not in self.__commands:
-                print("** class name doesn't exist **")
-            else:
-                if arg.split()[1] not in obj_keys:
-                    print("** no instance found **")
-                else:
-                    print("** attribute name missing **")
-        elif len(arg.split()) == 3:
-            if arg.split()[0] not in self.__commands:
-                print("** class doesn't exist **")
-            else:
-                if arg.split()[1] not in obj_keys:
-                    print("** no instance found **")
-                else:
-                    print("** value missing **")
+        if validateUpdateArgs(arg, ids, self.__commands):
+            cls, id, dictionary = argToDict(arg)
         else:
-            cls_name, id, key, value = arg.split(' ', 3)
-            if cls_name not in self.__commands:
-                print("** class name doesn't exist **")
-            elif id not in obj_keys:
-                print("** no instance found **")
-            else:
-                k = cls_name + "." + id
-                obj = all_objs[k]
+            return False
 
-                if key not in ['id', 'created_at', 'updated_at']:
-                    if value.isdigit():
-                        value = int(value)
-                    elif len(value.split('.')) == 2 and\
-                            all([i.isdigit() for i in value.split('.')]):
-                        value = float(value)
-                    else:
-                        if value[0] == '"' and value[len(value) - 1] == '"':
-                            value = value.strip('"')
-                        else:
-                            value = str(value.split(' ', 1)[0])
-                    setattr(obj, key, value)
-                    storage.save()
+        obj = all_objs[cls + '.' + id]
+        for key, value in dictionary.items():
+            setattr(obj, key, value)
+        storage.save()
 
 
 if __name__ == "__main__":
