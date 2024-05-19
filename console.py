@@ -62,7 +62,8 @@ class HBNBCommand(cmd.Cmd):
         command_dict = {
                 'all': self.do_all,
                 'count': self.do_count,
-                'show' : self.do_show
+                'show' : self.do_show,
+                'destroy' : self.do_destroy
                 }
         cmd_arg = re.search(r"\..+\(", arg)
         cls_name = re.search(r".+\.", arg)
