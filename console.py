@@ -61,16 +61,21 @@ class HBNBCommand(cmd.Cmd):
         """
         command_dict = {
                 'all': self.do_all,
-                'count': self.do_count
+                'count': self.do_count,
+                'show' : self.do_show
                 }
-        cmd_arg = re.search(r"\..+()", arg)
+        cmd_arg = re.search(r"\..+\(", arg)
         cls_name = re.search(r".+\.", arg)
+        id_n = re.search(r"\".+\"", arg)
         if cls_name:
-            c = cls_name.group().rstrip('.')
+            c = cls_name.group().strip(".")
             if c in self.__commands:
                 if cmd_arg:
-                    c_arg = cmd_arg.group().strip('.()')
+                    c_arg = cmd_arg.group().strip(".()")
                     if c_arg in list(command_dict.keys()):
+                        if id_n:
+                            id = id_n.group().strip('"\'')
+                            return command_dict[c_arg](c + " " + id)
                         return command_dict[c_arg](c)
         print(f"*** Unknown syntax: {arg}")
         return False
