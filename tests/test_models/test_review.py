@@ -60,7 +60,8 @@ class TestReviewInstantiation(unittest.TestCase):
 
 
 class TestReviewSave(unittest.TestCase):
-
+    """Testing the <Review.save()> functionality.
+    """
     @classmethod
     def setUpClass(cls):
         if os.path.isfile('file.json'):
@@ -102,7 +103,8 @@ class TestReviewSave(unittest.TestCase):
 
 
 class TestReviewAttributes(unittest.TestCase):
-
+    """Testin the data type of all <Review> object attributes.
+    """
     def test_review_place_id_attr(self):
         self.assertTrue(hasattr(Review(), 'place_id'))
 
@@ -114,7 +116,8 @@ class TestReviewAttributes(unittest.TestCase):
 
 
 class TestReviewAttributeAccessibilityAndType(unittest.TestCase):
-
+    """Testing the accessibity and type of a <Review> object attribute.
+    """
     def test_review_place_id(self):
         self.assertIsInstance(Review().place_id, str)
 
