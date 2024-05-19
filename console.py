@@ -51,6 +51,15 @@ class HBNBCommand(cmd.Cmd):
                   'Place', 'Review'
                   ]
 
+    def do_quit(self):
+        """Quit command to exit the program"""
+        return True
+
+    def do_EOF(self):
+        """Handles the end-of-file signal"""
+        print("")
+        return True
+
     def emptyline(self):
         """Command to execute when an emptyline is read.
         """
@@ -85,17 +94,6 @@ class HBNBCommand(cmd.Cmd):
                 return command_dict[c_arg](args)
         print(f"*** Unknown syntax: {arg}")
         return False
-
-    def do_quit(self, arg):
-        """Quite command to exit the program
-        """
-        return True
-
-    def do_EOF(self, arg):
-        """Handles the end-of-file signal.
-        """
-        print()
-        return True
 
     def help_create(self):
         h_str = "".join(["Creates a new instance of <BaseModel>, ",
