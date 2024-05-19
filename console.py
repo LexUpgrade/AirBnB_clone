@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """Defines a class <HBNBCommand>."""
+import re
 import cmd
 from models import storage
 from models.user import User
@@ -54,6 +55,25 @@ class HBNBCommand(cmd.Cmd):
         """Command to execute when an emptyline is read.
         """
         pass
+
+    def default(self, arg):
+        """Default behaviour for invalid commands.
+        """
+        command_dict = {
+                'all': self.do_all,
+                'count': self.do_count
+                }
+        cmd_arg = re.search(r"\..+()", arg)
+        cls_name = re.search(r".+\.", arg)
+        if cls_name:
+            c = cls_name.group().rstrip('.')
+            if c in self.__commands:
+                if cmd_arg:
+                    c_arg = cmd_arg.group().strip('.()')
+                    if c_arg in list(command_dict.keys()):
+                        return command_dict[c_arg](c)
+        print(f"*** Unknown syntax: {arg}")
+        return False
 
     def do_quit(self, arg):
         """Quite command to exit the program.
@@ -148,15 +168,42 @@ class HBNBCommand(cmd.Cmd):
     def do_all(self, arg):
         all_objs = storage.all()
 
+        l = list()
         if not arg:
-            [print(obj) for i, obj in all_objs.items()]
+            l.extend([str(obj) for i, obj in all_objs.items()])
         else:
             if arg not in self.__commands:
                 print("** class dosen't exist **")
             else:
                 for k, v in all_objs.items():
                     if k.rsplit(".")[0] == arg:
-                        print(v)
+                        l.append(str(v))
+        print(l)
+
+    def help_count(self):
+        h_str = "".join(["Prints the number of a specified object ",
+                         "in memory."
+                         ])
+
+    def complete_count(self, text, line, beidx, enidx):
+        if text:
+            complete = [i for i in self.__commands if i.startswith(text)]
+        else:
+            complete = self.__commands.copy()
+        return complete
+
+    def do_count(self, arg):
+        all_objs = storage.all()
+
+        l = list()
+        if arg is None:
+            print("** class name missing **")
+        elif arg not in self.__commands:
+            print("** class doesn't exist **")
+        else:
+            l.extend([i for i in all_objs.keys() if i.startswith(arg)])
+            print(len(l))
+
 
     def help_update(self):
         h_str = "".join(["Updates an instance based on the class name ",
