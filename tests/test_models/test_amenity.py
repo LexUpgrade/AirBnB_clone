@@ -58,8 +58,10 @@ class TestAmenityInstantiation(unittest.TestCase):
         self.assertTrue(type(d['__class__']), str)
         self.assertEqual(d['__class__'], 'Amenity')
 
-class TestAmenitySave(unittest.TestCase):
 
+class TestAmenitySave(unittest.TestCase):
+    """Test the <Amenity.save()> functionality.
+    """
     @classmethod
     def setUpClass(cls):
         if os.path.isfile('file.json'):
@@ -103,13 +105,15 @@ class TestAmenitySave(unittest.TestCase):
 
 
 class TestAmenityAttributes(unittest.TestCase):
-
+    """Validates attributes of a <Amenity> object.
+    """
     def test_amenity_name_attr(self):
         self.assertTrue(hasattr(Amenity(), 'name'))
 
 
 class TestAmenityAttributeAccessibilityAndType(unittest.TestCase):
-
+    """Test the accessibility and type of a <Amenity> object attributes.
+    """
     def test_amenity_name(self):
         self.assertIsInstance(Amenity().name, str)
 
