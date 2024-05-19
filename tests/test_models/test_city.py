@@ -60,7 +60,8 @@ class TestCityInstantiation(unittest.TestCase):
 
 
 class TestCitySave(unittest.TestCase):
-
+    """Test the <City.save().> functionality.
+    """
     @classmethod
     def setUpClass(cls):
         if os.path.isfile('file.json'):
@@ -102,16 +103,18 @@ class TestCitySave(unittest.TestCase):
 
 
 class TestCityAttributes(unittest.TestCase):
-
+    """Test <City> attribute data type.
+    """
     def test_city_state_id_attr(self):
         self.assertTrue(hasattr(City(), 'state_id'))
-    
+
     def test_city_name_attr(self):
         self.assertTrue(hasattr(City(), 'name'))
 
 
 class TestCityAttributeAccessibilityAndType(unittest.TestCase):
-
+    """Tests the accessibility and type of a <City> object attributes.
+    """
     def setUp(self):
         self.ct = City()
 
