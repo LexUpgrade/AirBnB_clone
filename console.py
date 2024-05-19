@@ -73,8 +73,8 @@ class HBNBCommand(cmd.Cmd):
         command_dict = {
                 'all': self.do_all,
                 'count': self.do_count,
-                'show' : self.do_show,
-                'destroy' : self.do_destroy,
+                'show': self.do_show,
+                'destroy': self.do_destroy,
                 'update': self.do_update
                 }
         args = None
@@ -179,9 +179,9 @@ class HBNBCommand(cmd.Cmd):
     def do_all(self, arg):
         all_objs = storage.all()
 
-        l = list()
+        lst = list()
         if not arg:
-            l.extend([str(obj) for i, obj in all_objs.items()])
+            lst.extend([str(obj) for i, obj in all_objs.items()])
         else:
             if arg not in self.__commands:
                 print("** class dosen't exist **")
@@ -189,8 +189,8 @@ class HBNBCommand(cmd.Cmd):
             else:
                 for k, v in all_objs.items():
                     if k.rsplit(".")[0] == arg:
-                        l.append(str(v))
-        print(l)
+                        lst.append(str(v))
+        print(lst)
 
     def help_count(self):
         h_str = "".join(["Prints the number of a specified object ",
@@ -208,15 +208,14 @@ class HBNBCommand(cmd.Cmd):
     def do_count(self, arg):
         all_objs = storage.all()
 
-        l = list()
+        lst = list()
         if arg is None:
             print("** class name missing **")
         elif arg not in self.__commands:
             print("** class doesn't exist **")
         else:
-            l.extend([i for i in all_objs.keys() if i.startswith(arg)])
-            print(len(l))
-
+            lst.extend([i for i in all_objs.keys() if i.startswith(arg)])
+            print(len(lst))
 
     def help_update(self):
         h_str = "".join(["Updates an instance based on the class name ",
