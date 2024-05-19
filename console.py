@@ -87,7 +87,7 @@ class HBNBCommand(cmd.Cmd):
         return False
 
     def do_quit(self, arg):
-        """Quite command to exit the program.
+        """Quite command to exit the program
         """
         return True
 
