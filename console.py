@@ -196,6 +196,7 @@ class HBNBCommand(cmd.Cmd):
         h_str = "".join(["Prints the number of a specified object ",
                          "in memory."
                          ])
+        print(h_str)
 
     def complete_count(self, text, line, beidx, enidx):
         if text:
