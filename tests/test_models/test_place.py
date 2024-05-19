@@ -60,7 +60,8 @@ class TestPlaceInstantiation(unittest.TestCase):
 
 
 class TestPlaceSave(unittest.TestCase):
-
+    """Test the <User.save()> functionality.
+    """
     @classmethod
     def setUpClass(cls):
         if os.path.isfile('file.json'):
@@ -102,7 +103,8 @@ class TestPlaceSave(unittest.TestCase):
 
 
 class TestPlaceAttributes(unittest.TestCase):
-
+    """Validates attributes of a <Place> object.
+    """
     def test_place_city_id_attr(self):
         self.assertTrue(hasattr(Place(), 'city_id'))
 
@@ -135,7 +137,8 @@ class TestPlaceAttributes(unittest.TestCase):
 
 
 class TestPlaceAttributeAccessibilityAndType(unittest.TestCase):
-
+    """Test attribute accessibility and type.
+    """
     def setUp(self):
         self.plc = Place()
 
