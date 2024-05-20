@@ -44,4 +44,5 @@ class FileStorage:
         else:
             for value in json_dict.values():
                 cls = value["__class__"]
+                del value["__class__"]
                 self.new(eval(cls)(**value))
