@@ -98,7 +98,7 @@ def argToDict(arg):
             tmp_dict[k] = v
     else:
         cls, id, key, value = arg.split(' ', 3)
-        tmp_dict[key] = value
+        tmp_dict[key] = value.split()[0]
 
     for k, v in tmp_dict.items():
         ky = k.strip("\"'")
