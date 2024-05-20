@@ -117,8 +117,8 @@ class TestPlaceAttributes(unittest.TestCase):
     def test_place_description_attr(self):
         self.assertTrue(hasattr(Place(), 'description'))
 
-    def test_place_number_rooms_attr(self):
-        self.assertTrue(hasattr(Place(), 'number_rooms'))
+    def test_place_number_of_rooms_attr(self):
+        self.assertTrue(hasattr(Place(), 'number_of_rooms'))
 
     def test_place_number_bathrooms_attr(self):
         self.assertTrue(hasattr(Place(), 'number_bathrooms'))
@@ -154,8 +154,8 @@ class TestPlaceAttributeAccessibilityAndType(unittest.TestCase):
     def test_place_description(self):
         self.assertIsInstance(self.plc.description, str)
 
-    def test_place_number_rooms(self):
-        self.assertIsInstance(self.plc.number_rooms, int)
+    def test_place_number_of_rooms(self):
+        self.assertIsInstance(self.plc.number_of_rooms, int)
 
     def test_place_number_bathrooms(self):
         self.assertIsInstance(self.plc.number_bathrooms, int)
