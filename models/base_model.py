@@ -16,8 +16,8 @@ class BaseModel:
             kwarg (dict): key/word arguement from  json file for instantiation.
         """
         self.id = str(uuid4())
-        self.created_at = datetime.now()
-        self.updated_at = datetime.now()
+        self.created_at = datetime.today()
+        self.updated_at = datetime.today()
         if len(kwargs) != 0:
             for k in kwargs.keys():
                 if k != '__class__':
@@ -36,7 +36,7 @@ class BaseModel:
         """Updates the public instance attribute <updated_at> with
         the current datetime. And updates the JSON file 'file.json'.
         """
-        self.updated_at = datetime.now()
+        self.updated_at = datetime.today()
         models.storage.save()
 
     def to_dict(self):
