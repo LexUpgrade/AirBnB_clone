@@ -87,31 +87,37 @@ def validateUpdateArgs(arg, ids, commands):
 def argToDict(arg):
     """Returns a dictionary of key/word arguments.
     """
-    dictionary, tmp_dict, cls, id = dict(), dict(), None, None
-    dt = re.search(r"\{(.)+\}\)$", arg)
+    dictionary, tmp_dict, cls, id = {}, {}, None, None
+    dt = re.search(r"\{.+\}", arg)
     if dt:
-        dt_str = dt.group().strip(")").strip("{}")
-        kw_list = dt_str.split(",")
-        for i in kw_list:
-            k = str(i.split()[0].rstrip(":").strip("\"'"))
-            v = i.split()[1][:-1]
+        cls, id, dict = arg.split(' ', 2)
+        dict = dict.strip("{}")
+        dict = dict.replace(", \"", "*->>\"").replace(", '", "*->>'")
+        dict = dict.split("*->>")
+        for i in dict:
+            k = re.search(r"[\"'].+:", i).group().rstrip(":")
+            v = re.search(r": .+", i).group().lstrip(": ")
             tmp_dict[k] = v
     else:
-        cls, id, key, value = arg.split(' ', 3)
-        tmp_dict[key] = value.split()[0]
-
+        cls, id, karg = arg.split(' ', 2)
+        key = re.search(r"\".+\" ", karg).group().rstrip()
+        value = re.search(r" .+", karg[karg.index('"', 1):]).group().lstrip()
+        if value.startswith('"') and value.endswith('"'):
+            value = re.search("\".+?\"", value).group()
+            tmp_dict[key] = value
+        else:
+            tmp_dict[key] = value.split()[0].strip(",")
+    
     for k, v in tmp_dict.items():
-        ky = k.strip("\"'")
-        if v.isdigit():
+        ky = k.strip("\"' ")
+        if (v.startswith('"') and v.endswith('"')) or\
+                (v.startswith("'") and v.endswith("'")):
+            dictionary[ky] = str(v.strip("\"'"))
+        elif v.isdigit():
             dictionary[ky] = int(v)
         elif len(v.split('.')) == 2 and\
                 all([i.isdigit() for i in v.split('.')]):
             dictionary[ky] = float(v)
-        else:
-            if v[0] == '"' and v[len(v) - 1] == '"':
-                dictionary[ky] = v.strip('"')
-            else:
-                dictionary[ky] = str(v)
     return (cls, id, dictionary)
 
 
@@ -150,22 +156,23 @@ class HBNBCommand(cmd.Cmd):
                 'update': self.do_update
                 }
         args = None
+        cnd = re.search(r"\..+\(.*\)", arg)
         cls_name = re.search(r"\w+\.", arg)
-        cmd_arg = re.search(r"\..+\)", arg)
         id_n = re.search(r"\"(.+-){4}[0-9a-z]+\"", arg)
-        kwarg = re.search(r", \"[\x00-\x7f]+\)", arg)
-        if cmd_arg:
-            c_arg = re.search(r"[^.].+\(", cmd_arg.group()).group()[:-1]
-            if c_arg in list(command_dict.keys()):
-                c = cls_name.group()[:-1]
-                if c in self.__commands:
-                    args = c
+        kwarg = re.search(r"\", .+\)", arg)
+        if cnd:
+            cnd = re.search(r"\..+\(", arg)
+            cnd = cnd.group()[1:-1]
+            if cnd in list(command_dict.keys()):
+                cls_name = cls_name.group()[:-1]
+                if cls_name in self.__commands:
+                    args = cls_name
                     if id_n:
                         args += ' ' + id_n.group()[1:-1]
                         if kwarg:
                             args += ' '\
-                                    + kwarg.group()[3:].replace("\",", "")[:-1]
-                return command_dict[c_arg](args)
+                                    + kwarg.group()[3:].strip("), ")
+                return command_dict[cnd](args)
         print(f"*** Unknown syntax: {arg}")
         return False
 
