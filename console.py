@@ -266,7 +266,7 @@ class HBNBCommand(cmd.Cmd):
         else:
             arg = arg.split()[0]
             if arg not in self.__commands:
-                print("** class dosen't exist **")
+                print("** class doesn't exist **")
                 return False
             else:
                 for k, v in all_objs.items():
