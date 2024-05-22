@@ -196,7 +196,7 @@ class HBNBCommand(cmd.Cmd):
         if not arg:
             print("** class name missing **")
         elif arg not in self.__commands:
-            print("** class dosen't exist **")
+            print("** class doesn't exist **")
         else:
             cls_name = arg + "()"
             my_model = eval(cls_name)
