@@ -262,16 +262,17 @@ class HBNBCommand(cmd.Cmd):
 
         objects = list()
         if not arg:
-            objects.extend([obj for i, obj in all_objs.items()])
+            objects.extend([str(obj) for i, obj in all_objs.items()])
         else:
+            arg = arg.split()[0]
             if arg not in self.__commands:
                 print("** class dosen't exist **")
                 return False
             else:
                 for k, v in all_objs.items():
                     if k.rsplit(".")[0] == arg:
-                        objects.append(v)
-        [print(obj) for obj in objects]
+                        objects.append(str(v))
+        print(objects)
 
     def help_count(self):
         h_str = "".join(["Prints the number of a specified object ",
