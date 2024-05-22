@@ -107,7 +107,7 @@ def argToDict(arg):
             tmp_dict[key] = value
         else:
             tmp_dict[key] = value.split()[0].strip(",")
-    
+
     for k, v in tmp_dict.items():
         ky = k.strip("\"' ")
         if (v.startswith('"') and v.endswith('"')) or\
@@ -158,7 +158,7 @@ class HBNBCommand(cmd.Cmd):
         args = None
         cnd = re.search(r"\..+\(.*\)", arg)
         cls_name = re.search(r"\w+\.", arg)
-        id_n = re.search(r"\"(.+-){4}[0-9a-z]+\"", arg)
+        id_n = re.search(r"\(\".+\"", arg)
         kwarg = re.search(r"\", .+\)", arg)
         if cnd:
             cnd = re.search(r"\..+\(", arg)
@@ -168,11 +168,13 @@ class HBNBCommand(cmd.Cmd):
                 if cls_name in self.__commands:
                     args = cls_name
                     if id_n:
-                        args += ' ' + id_n.group()[1:-1]
+                        idx = id_n.group().index('"', 2)
+                        id_n = id_n.group()[2:idx]
+                        args += ' ' + id_n
                         if kwarg:
                             args += ' '\
                                     + kwarg.group()[3:].strip("), ")
-                return command_dict[cnd](args)
+                    return command_dict[cnd](args)
         print(f"*** Unknown syntax: {arg}")
         return False
 
