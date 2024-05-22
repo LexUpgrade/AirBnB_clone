@@ -100,7 +100,7 @@ def argToDict(arg):
             tmp_dict[k] = v
     else:
         cls, id, karg = arg.split(' ', 2)
-        key = re.search(r"\".+\", ", karg).group().rstrip()
+        key = re.search(r"\".+\" ", karg).group().rstrip()
         value = re.search(r" .+", karg[karg.index('"', 1):]).group().lstrip()
         if value.startswith('"') and value.endswith('"'):
             value = re.search("\".+?\"", value).group()
@@ -159,7 +159,7 @@ class HBNBCommand(cmd.Cmd):
         cnd = re.search(r"\..+\(.*\)", arg)
         cls_name = re.search(r"\w+\.", arg)
         id_n = re.search(r"\(\".+\"", arg)
-        kwarg = re.search(r"\", .+\)", arg)
+        kwarg = re.search(r"\".+\",? .+\)", arg)
         if cnd:
             cnd = re.search(r"\..+\(", arg)
             cnd = cnd.group()[1:-1]
@@ -169,11 +169,11 @@ class HBNBCommand(cmd.Cmd):
                     args = cls_name
                     if id_n:
                         idx = id_n.group().index('"', 2)
-                        id_n = id_n.group()[2:idx]
-                        args += ' ' + id_n
+                        id = id_n.group()[2:idx]
+                        args += ' ' + id
                         if kwarg:
-                            args += ' '\
-                                    + kwarg.group()[3:].strip("), ")
+                            kw = kwarg.group()[idx + 1:].strip("), ")
+                            args += ' ' + kw
                     return command_dict[cnd](args)
         print(f"*** Unknown syntax: {arg}")
         return False
