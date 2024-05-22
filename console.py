@@ -174,7 +174,7 @@ class HBNBCommand(cmd.Cmd):
                         if kwarg:
                             kw = kwarg.group()[idx + 1:].strip("), ")
                             args += ' ' + kw
-                    return command_dict[cnd](args)
+                return command_dict[cnd](args)
         print(f"*** Unknown syntax: {arg}")
         return False
 
