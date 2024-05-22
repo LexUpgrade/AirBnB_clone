@@ -95,12 +95,12 @@ def argToDict(arg):
         dict = dict.replace(", \"", "*->>\"").replace(", '", "*->>'")
         dict = dict.split("*->>")
         for i in dict:
-            k = re.search(r"[\"'].+:", i).group().rstrip(":")
+            k = re.search(r"[\"'].+[\"']:", i).group().rstrip(":")
             v = re.search(r": .+", i).group().lstrip(": ")
             tmp_dict[k] = v
     else:
         cls, id, karg = arg.split(' ', 2)
-        key = re.search(r"\".+\" ", karg).group().rstrip()
+        key = re.search(r"\".+\", ", karg).group().rstrip()
         value = re.search(r" .+", karg[karg.index('"', 1):]).group().lstrip()
         if value.startswith('"') and value.endswith('"'):
             value = re.search("\".+?\"", value).group()
@@ -258,9 +258,9 @@ class HBNBCommand(cmd.Cmd):
     def do_all(self, arg):
         all_objs = storage.all()
 
-        lst = list()
+        objects = list()
         if not arg:
-            lst.extend([str(obj) for i, obj in all_objs.items()])
+            objects.extend([obj for i, obj in all_objs.items()])
         else:
             if arg not in self.__commands:
                 print("** class dosen't exist **")
@@ -268,8 +268,8 @@ class HBNBCommand(cmd.Cmd):
             else:
                 for k, v in all_objs.items():
                     if k.rsplit(".")[0] == arg:
-                        lst.append(str(v))
-        print(lst)
+                        objects.append(v)
+        [print(obj) for obj in objects]
 
     def help_count(self):
         h_str = "".join(["Prints the number of a specified object ",
