@@ -76,7 +76,7 @@ def validateUpdateArgs(arg, ids, commands):
     else:
         cls, id, key, value = arg.split(' ', 3)
         if cls not in commands:
-            print("** class name doesn't exist **")
+            print("** class doesn't exist **")
         elif id not in ids:
             print("** no instance found **")
         else:
