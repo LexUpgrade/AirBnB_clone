@@ -1,0 +1,16 @@
+/**
+ * AirBnB Clone: Footer Stylesheet
+ */
+
+/* Footer */
+footer {
+	background-color: white;
+	height: 60px;
+	width: 100%;
+	border-top: 1px solid #CCCCCC;
+	position: fixed;
+	display: fixed;
+	justify-content: center;
+	align-items: center;
+	bottom: 0;
+}
