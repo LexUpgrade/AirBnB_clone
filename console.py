@@ -84,40 +84,48 @@ def validateUpdateArgs(arg, ids, commands):
     return False
 
 
+def convertType(tmp_dict):
+    """Converts dictionary values approprately."""
+    dictionary = {}
+    for k, v in tmp_dict.items():
+        ky = k.strip("\"' }")
+        if v.isdigit():
+            dictionary[ky] = int(v)
+        elif len(v.split('.')) == 2 and\
+                all([i.isdigit() for i in v.split('.')]):
+            dictionary[ky] = float(v)
+        else:
+            dictionary[ky] = v.strip("'\"")
+    return (dictionary)
+
+
 def argToDict(arg):
     """Returns a dictionary of key/word arguments.
     """
     dictionary, tmp_dict, cls, id = {}, {}, None, None
-    dt = re.search(r"\{.+\}", arg)
-    if dt:
+    isDict = re.search(r"\{.+\}", arg)
+    if isDict:
         cls, id, dict = arg.split(' ', 2)
         dict = dict.strip("{}")
         dict = dict.replace(", \"", "*->>\"").replace(", '", "*->>'")
         dict = dict.split("*->>")
         for i in dict:
-            k = re.search(r"[\"'].+[\"']:", i).group().rstrip(":")
-            v = re.search(r": .+", i).group().lstrip(": ")
+            k = re.search(r"(.+['\"]?): [\"']?", i).groups()[0]
+            v = i[len(k):]
+            v = re.search(r": (.+)", v).groups()[0]
+            k = k.strip("'\"")
+            v = v.strip("'\"")
             tmp_dict[k] = v
+        for i, j in tmp_dict.items():
+            print(i, j)
     else:
         cls, id, karg = arg.split(' ', 2)
-        key = re.search(r"\".+\" ", karg).group().rstrip()
-        value = re.search(r" .+", karg[karg.index('"', 1):]).group().lstrip()
-        if value.startswith('"') and value.endswith('"'):
-            value = re.search("\".+?\"", value).group()
-            tmp_dict[key] = value
-        else:
-            tmp_dict[key] = value.split()[0].strip(",")
-
-    for k, v in tmp_dict.items():
-        ky = k.strip("\"' ")
-        if (v.startswith('"') and v.endswith('"')) or\
-                (v.startswith("'") and v.endswith("'")):
-            dictionary[ky] = str(v.strip("\"'"))
-        elif v.isdigit():
-            dictionary[ky] = int(v)
-        elif len(v.split('.')) == 2 and\
-                all([i.isdigit() for i in v.split('.')]):
-            dictionary[ky] = float(v)
+        k, v = re.search(r"((?!\\)['\"]?.+(?!\\)['\"]), (.+)",
+                         karg).groups()
+        if (k.startswith('"') and k.endswith('"')) or\
+                (k.startswith("'") and k.endswith("'")):
+            tmp_dict[k.strip('"\'')] = v
+    dictionary = convertType(tmp_dict)
     return (cls, id, dictionary)
 
 
@@ -156,25 +164,27 @@ class HBNBCommand(cmd.Cmd):
                 'update': self.do_update
                 }
         args = None
-        cnd = re.search(r"\..+\(.*\)", arg)
-        cls_name = re.search(r"\w+\.", arg)
-        id_n = re.search(r"\(\".+\"", arg)
-        kwarg = re.search(r"\".+\",? .+\)", arg)
-        if cnd:
-            cnd = re.search(r"\..+\(", arg)
-            cnd = cnd.group()[1:-1]
-            if cnd in list(command_dict.keys()):
-                cls_name = cls_name.group()[:-1]
-                if cls_name in self.__commands:
-                    args = cls_name
+        cmd_ = re.search(r"\..+\(", arg)
+        id_n = re.search(r"\"[-0-9a-z]+\"", arg)
+        cls_ = re.search(r".+\(", arg)
+        kw_args = re.search(r", .+\)", arg)
+        if cmd_:
+            i, j = cmd_.span()
+            cmd_ = arg[i:j].strip('.(')
+            if cmd_ in list(command_dict.keys()):
+                i, j = cls_.span()
+                cls_ = arg[i:j].split('.')[0]
+                if cls_ in self.__commands:
+                    args = cls_ + ' '
                     if id_n:
-                        idx = id_n.group().index('"', 2)
-                        id = id_n.group()[2:idx]
-                        args += ' ' + id
-                        if kwarg:
-                            kw = kwarg.group()[idx + 1:].strip("), ")
-                            args += ' ' + kw
-                return command_dict[cnd](args)
+                        i, j = id_n.span()
+                        args += arg[i:j].strip('"\'')
+                        if kw_args:
+                            i, j = kw_args.span()
+                            args += ' ' + arg[i:j].strip(', )')
+                if cmd_ == 'update':
+                    args = '***4rOmD4FaUlT***' + args
+                return command_dict[cmd_](args)
         print(f"*** Unknown syntax: {arg}")
         return False
 
@@ -316,13 +326,22 @@ class HBNBCommand(cmd.Cmd):
     def do_update(self, arg):
         all_objs = storage.all()
         ids = [i.split(".")[1] for i in list(all_objs.keys())]
-        cls, id, dictionary = None, None, None
+        cls, id, dictionary = None, None, dict()
 
-        if validateUpdateArgs(arg, ids, self.__commands):
-            cls, id, dictionary = argToDict(arg)
+        if arg.startswith("***4rOmD4FaUlT***"):
+            arg = arg[17:]
+            if validateUpdateArgs(arg, ids, self.__commands):
+                cls, id, dictionary = argToDict(arg)
+                print("from argToDict", dictionary)
+            else:
+                return False
         else:
-            return False
-
+            if validateUpdateArgs(arg, ids, self.__commands):
+                cls, id, karg = arg.split(' ', 2)
+                k, v = re.search(r"(.+) (.+)", karg).groups()
+                dictionary = convertType({k: v})
+            else:
+                return False
         obj = all_objs[cls + '.' + id]
         for key, value in dictionary.items():
             setattr(obj, str(key), value)
